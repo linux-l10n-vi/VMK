@@ -124,35 +124,30 @@ Nếu bạn đang sử dụng môi trường Desktop KDE trên giao thức Wayla
 <img width="866" height="557" alt="ảnh" src="https://github.com/user-attachments/assets/29c84587-8b95-4b2d-b314-9daf90d0f59c" />
 
 
-### 🐧 1. Debian / Ubuntu (non-GNOME) (Bao gồm cả Linux Mint)
-[![Download Debian](https://img.shields.io/badge/Download-Debian%20%2F%20Ubuntu-orange?style=for-the-badge&logo=debian)](https://github.com/user-attachments/files/24423654/install_vmk_debian.sh)
-* **Link tải:** [install_vmk_debian.sh](https://github.com/user-attachments/files/24423654/install_vmk_debian.sh)
-* **Lệnh cài nhanh:** `wget https://github.com/user-attachments/files/24423654/install_vmk_debian.sh && bash install_vmk_debian.sh`
+🐧 1. Debian / Ubuntu (non-GNOME) (Bao gồm cả Linux Mint)
 
----
+    Link tải: install_vmk_debian_0.9.3.sh
 
-### 🏢 2. Ubuntu GNOME
-[![Download Ubuntu](https://img.shields.io/badge/Download-Ubuntu%20GNOME-E94333?style=for-the-badge&logo=ubuntu)](https://github.com/user-attachments/files/24423663/install_vmk_ubuntugnome.sh)
-* **Link tải:** [install_vmk_ubuntugnome.sh](https://github.com/user-attachments/files/24423663/install_vmk_ubuntugnome.sh)
-* **Lệnh cài nhanh:** `wget https://github.com/user-attachments/files/24423663/install_vmk_ubuntugnome.sh && bash install_vmk_ubuntugnome.sh`
+    Lệnh cài nhanh: wget https://github.com/user-attachments/files/24828567/install_vmk_debian_0.9.3.sh && bash install_vmk_debian_0.9.3.sh
 
----
+🏢 2. Ubuntu 24.04 (GNOME)
 
-### 🔵 3. Fedora
-[![Download Fedora](https://img.shields.io/badge/Download-Fedora-51A2DA?style=for-the-badge&logo=fedora)](https://github.com/user-attachments/files/24423665/install_vmk_fedora.sh)
-* **Link tải:** [install_vmk_fedora.sh](https://github.com/user-attachments/files/24423665/install_vmk_fedora.sh)
-* **Lệnh cài nhanh:** `wget https://github.com/user-attachments/files/24423665/install_vmk_fedora.sh && bash install_vmk_fedora.sh`
+    Trạng thái: 🕒 Coming Soon (Đang cập nhật bản vá cho GNOME)
 
----
+🔵 3. Fedora
 
-### 🏹 4. Arch Linux
-[![Download Arch](https://img.shields.io/badge/Download-Arch%20Linux-1793D1?style=for-the-badge&logo=arch-linux)](https://github.com/user-attachments/files/24423664/install_vmk_arch.sh)
-* **Link tải:** [install_vmk_arch.sh](https://github.com/user-attachments/files/24423664/install_vmk_arch.sh)
-* **Lệnh cài nhanh:** `wget https://github.com/user-attachments/files/24423664/install_vmk_arch.sh && bash install_vmk_arch.sh`
+    Link tải: install_vmk_fedora_0.9.3.sh
 
----
+    Lệnh cài nhanh: wget https://github.com/user-attachments/files/24828564/install_vmk_fedora_0.9.3.sh && bash install_vmk_fedora_0.9.3.sh
 
-### 🦎 5. openSUSE
-[![Download openSUSE](https://img.shields.io/badge/Download-openSUSE-73BA48?style=for-the-badge&logo=opensuse)](https://github.com/user-attachments/files/24423662/install_vmk_opensuse.sh)
-* **Link tải:** [install_vmk_opensuse.sh](https://github.com/user-attachments/files/24423662/install_vmk_opensuse.sh)
-* **Lệnh cài nhanh:** `wget https://github.com/user-attachments/files/24423662/install_vmk_opensuse.sh && bash install_vmk_opensuse.sh`
+🏹 4. Arch Linux
+
+    Link tải: install_vmk_arch_0.9.3.sh
+
+    Lệnh cài nhanh: wget https://github.com/user-attachments/files/24828599/install_vmk_arch_0.9.3.sh && bash install_vmk_arch_0.9.3.sh
+
+🦎 5. openSUSE
+
+    Link tải: install_vmk_opensuse_0.9.3.sh
+
+    Lệnh cài nhanh: wget https://github.com/user-attachments/files/24828570/install_vmk_opensuse_0.9.3.sh && bash install_vmk_opensuse_0.9.3.sh
