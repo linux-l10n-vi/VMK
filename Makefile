@@ -14,7 +14,7 @@ SYSUSERSDIR = $(PREFIX)/lib/sysusers.d
 BUILD_DIR = fcitx5-vmk/build
 SERVER_BINARY = fcitx5-vmk-server
 
-CXXFLAGS = -O3 -Wall -Wextra -std=c++17 -march=native -mtune=native
+CXXFLAGS = -O3 -Wall -Wextra -std=c++17
 LDFLAGS = -linput -ludev
 
 BLUE = \033[0;34m
@@ -114,19 +114,6 @@ install: build
 	@# Cài đặt license
 	@echo "$(YELLOW)  - Cài đặt license...$(NC)"
 	@install -Dm444 LICENSE $(DESTDIR)$(LICENSEDIR)/LICENSE
-	
-	@echo "$(BLUE)--- Đang cấu hình hệ thống ---$(NC)"
-	systemd-sysusers vmk.conf
-	@modprobe uinput || echo "$(YELLOW)Lưu ý: Không thể modprobe uinput. Hãy đảm bảo module đã bật.$(NC)"
-	@udevadm control --reload-rules && udevadm trigger
-	
-	@echo -e "\n$(GREEN)✓ Cài đặt VMK hoàn tất!$(NC)"
-	@echo -e "$(BOLD)Hướng dẫn kích hoạt:$(NC)"
-	@echo -e " 1. Chạy lệnh sau để bật Server cho chính bạn:"
-	@echo -e "    $(BLUE)sudo systemctl enable --now fcitx5-vmk-server@$$(whoami).service$(NC)"
-	@echo -e " 2. Khởi động lại Fcitx5:"
-	@echo -e "    $(BLUE)fcitx5 -rd$(NC)"
-	@echo -e " 3. Mở cấu hình Fcitx5 và thêm bộ gõ $(GREEN)VMK$(NC).\n"
 
 uninstall:
 	@echo "$(BLUE)Đang gỡ cài đặt Fcitx5 VMK...$(NC)"
