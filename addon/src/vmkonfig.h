@@ -9,11 +9,11 @@
 #ifndef _FCITX5_vmk_vmkCONFIG_H_ // ĐỔI TÊN HEADER GUARD
 #define _FCITX5_vmk_vmkCONFIG_H_
 
+#include <algorithm> // Thêm thư viện này để đảm bảo std::find hoạt động
 #include <fcitx-config/configuration.h>
 #include <fcitx-config/option.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx-utils/stringutils.h>
-#include <algorithm> // Thêm thư viện này để đảm bảo std::find hoạt động
 #include <string>
 #include <vector>
 
@@ -36,13 +36,14 @@ struct StringListAnnotation : public EnumAnnotation {
         }
     }
 
-protected:
+  protected:
     std::vector<std::string> list_;
 };
 
 struct InputMethodAnnotation : public StringListAnnotation {};
 struct ModeListAnnotation : public StringListAnnotation {
-    ModeListAnnotation() { list_ = {"vmk1","vmk2","vmk1hc","vmkpre"}; }};
+    ModeListAnnotation() { list_ = {"vmk1", "vmk2", "vmk1hc", "vmkpre"}; }
+};
 
 struct InputMethodConstrain {
     using Type = std::string;
@@ -59,7 +60,7 @@ struct InputMethodConstrain {
     }
     void dumpDescription(RawConfig &) const {}
 
-protected:
+  protected:
     const InputMethodOption *option_;
 };
 
@@ -93,57 +94,57 @@ FCITX_CONFIGURATION(
 // ĐỔI TÊN CONFIGURATION CHÍNH
 
 FCITX_CONFIGURATION(
-    vmkConfig, 
+    vmkConfig,
 
-OptionWithAnnotation<std::string, ModeListAnnotation> mode{
-        this,
-        "Mode",
-        _("Chế độ"),
-        "vmk1",
-        {},
-        {},
-        ModeListAnnotation()
-    };
-    //KeyListOption restoreKeyStroke{this,
-                                   //"RestoreKeyStroke",
-                                 //  _("Restore Key Stroke"),
-                                 //  {},
-                                //   KeyListConstrain()};
+    OptionWithAnnotation<std::string, ModeListAnnotation> mode{
+        this, "Mode", _("Chế độ"), "vmk1", {}, {}, ModeListAnnotation()};
+    // KeyListOption restoreKeyStroke{this,
+    //"RestoreKeyStroke",
+    //  _("Restore Key Stroke"),
+    //  {},
+    //   KeyListConstrain()};
     Option<std::string, InputMethodConstrain, DefaultMarshaller<std::string>,
            InputMethodAnnotation>
-        inputMethod{this, "InputMethod", _("Input Method"), "Telex",
-                    InputMethodConstrain(&inputMethod),
-                    // BẮT BUỘC SỬA: Thêm đối số DefaultMarshaller (Marshaller mặc định)
-                    {}, 
-                    // BẮT BUỘC: Thêm đối số Annotation bị thiếu
-                    InputMethodAnnotation()}; 
-OptionWithAnnotation<std::string, StringListAnnotation> outputCharset{
-        this, "OutputCharset", _("Output Charset"), "Unicode",
-        // BẮT BUỘC SỬA: OptionWithAnnotation cần đủ 7 đối số trong trường hợp này:
+        inputMethod{
+            this,
+            "InputMethod",
+            _("Input Method"),
+            "Telex",
+            InputMethodConstrain(&inputMethod),
+            // BẮT BUỘC SỬA: Thêm đối số DefaultMarshaller (Marshaller mặc định)
+            {},
+            // BẮT BUỘC: Thêm đối số Annotation bị thiếu
+            InputMethodAnnotation()};
+    OptionWithAnnotation<std::string, StringListAnnotation> outputCharset{
+        this,
+        "OutputCharset",
+        _("Output Charset"),
+        "Unicode",
+        // BẮT BUỘC SỬA: OptionWithAnnotation cần đủ 7 đối số trong trường hợp
+        // này:
         // 5. Constrain (Mặc định: NoConstrain)
-        {}, 
+        {},
         // 6. Marshaller (Mặc định: DefaultMarshaller)
-        {}, 
+        {},
         // 7. Annotation
-        StringListAnnotation()}; 
+        StringListAnnotation()};
     Option<bool> spellCheck{this, "SpellCheck", _("Enable spell check"), true};
     Option<bool> macro{this, "Macro", _("Enable Macro"), true};
     Option<bool> capitalizeMacro{this, "CapitalizeMacro", _("Capitalize Macro"),
-                         true};
+                                 true};
     Option<bool> autoNonVnRestore{this, "AutoNonVnRestore",
                                   _("Auto restore keys with invalid words"),
                                   true};
     Option<bool> modernStyle{this, "ModernStyle",
-                       _("Use oà, _uý (instead of òa, úy)"), false};
+                             _("Use oà, _uý (instead of òa, úy)"), false};
     Option<bool> freeMarking{this, "FreeMarking",
                              _("Allow type with more freedom"), true};
-   // SubConfigOption custumKeymap{this, "CustomKeymap", _("Custom Keymap"),
-                                 // ĐỔI TÊN PATH
-                               //  "fcitx://config/addon/vmk/custom_keymap"};
-    
-Option<bool> gemini{this, "Gemini", _("Gemini-fix"), false};
-Option<bool> chromex11{this, "ChromeX11", _("Chrome X11 Fix"), false};
-                           );
+    // SubConfigOption custumKeymap{this, "CustomKeymap", _("Custom Keymap"),
+    // ĐỔI TÊN PATH
+    //  "fcitx://config/addon/vmk/custom_keymap"};
+
+    Option<bool> gemini{this, "Gemini", _("Gemini-fix"), false};
+    Option<bool> chromex11{this, "ChromeX11", _("Chrome X11 Fix"), false};);
 } // namespace fcitx
 
 #endif

@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  */
-#ifndef _FCITX5_vmk_vmk_H_ 
-#define _FCITX5_vmk_vmk_H_ 
+#ifndef _FCITX5_vmk_vmk_H_
+#define _FCITX5_vmk_vmk_H_
 
-#include "bamboo-core.h" 
-#include "vmkonfig.h" 
+#include "bamboo-core.h"
+#include "vmkonfig.h"
 #include <fcitx-config/iniparser.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx/action.h>
@@ -19,10 +19,10 @@
 #include <fcitx/inputcontextproperty.h>
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/instance.h>
-#include <string>
-#include <optional>
-#include <unordered_map>
 #include <memory>
+#include <optional>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace fcitx {
@@ -31,7 +31,7 @@ namespace fcitx {
  * @brief RAII wrapper for CGo handle (uintptr_t).
  */
 class CGoObject {
-public:
+  public:
     CGoObject(std::optional<uintptr_t> handle = std::nullopt)
         : handle_(handle) {}
 
@@ -52,9 +52,7 @@ public:
         handle_ = handle;
     }
 
-    uintptr_t handle() const {
-        return handle_.value_or(0);
-    }
+    uintptr_t handle() const { return handle_.value_or(0); }
 
     uintptr_t release() {
         if (handle_) {
@@ -69,7 +67,7 @@ public:
         return handle_.has_value() && *handle_ != 0;
     }
 
-private:
+  private:
     void clear() {
         if (handle_) {
             DeleteObject(*handle_);
@@ -80,20 +78,19 @@ private:
     std::optional<uintptr_t> handle_;
 };
 
-class VMKState; 
+class VMKState;
 
-class vmkEngine final : public InputMethodEngine { 
-public:
+class vmkEngine final : public InputMethodEngine {
+  public:
     Instance *instance() const { return instance_; }
 
-    vmkEngine(Instance *instance); 
+    vmkEngine(Instance *instance);
 
     void activate(const InputMethodEntry &entry,
                   InputContextEvent &event) override;
     void deactivate(const fcitx::InputMethodEntry &entry,
                     fcitx::InputContextEvent &event) override;
-    void keyEvent(const InputMethodEntry &entry,
-                  KeyEvent &keyEvent) override;
+    void keyEvent(const InputMethodEntry &entry, KeyEvent &keyEvent) override;
 
     void reset(const InputMethodEntry &entry,
                InputContextEvent &event) override;
@@ -118,7 +115,7 @@ public:
     uintptr_t dictionary() const { return dictionary_.handle(); }
 
     uintptr_t macroTable() const {
-       if (config_.inputMethod.value().empty()) {
+        if (config_.inputMethod.value().empty()) {
             return 0;
         }
         auto it = macroTableObject_.find(*config_.inputMethod);
@@ -130,9 +127,9 @@ public:
 
     void refreshEngine();
     void refreshOption();
-    
-    void saveConfig() { safeSaveAsIni(config_, "conf/vmk.conf"); } 
-  void updateModeAction(InputContext *ic);
+
+    void saveConfig() { safeSaveAsIni(config_, "conf/vmk.conf"); }
+    void updateModeAction(InputContext *ic);
     void updateSpellAction(InputContext *ic);
     void updateMacroAction(InputContext *ic);
     void updateCapitalizeMacroAction(InputContext *ic);
@@ -141,8 +138,9 @@ public:
     void updateFreeMarkingAction(InputContext *ic);
     void updateInputMethodAction(InputContext *ic);
     void updateCharsetAction(InputContext *ic);
-void updateGeminiAction(InputContext *ic); // <--- THÊM DÒNG NÀY VÀO DÒNG 138
-void updateChromeX11Action(InputContext *ic); // <--- THÊM DÒNG NÀY
+    void
+    updateGeminiAction(InputContext *ic); // <--- THÊM DÒNG NÀY VÀO DÒNG 138
+    void updateChromeX11Action(InputContext *ic); // <--- THÊM DÒNG NÀY
     void populateConfig();
     // ibus-bamboo mode save/load
     void loadAppRules();
@@ -150,29 +148,29 @@ void updateChromeX11Action(InputContext *ic); // <--- THÊM DÒNG NÀY
     void showAppModeMenu(InputContext *ic);
     void closeAppModeMenu();
 
-private:
-bool freeMarkingValue_ = true;
+  private:
+    bool freeMarkingValue_ = true;
     Instance *instance_;
-    vmkConfig config_; 
-    vmkCustomKeymap customKeymap_; 
+    vmkConfig config_;
+    vmkCustomKeymap customKeymap_;
 
     // Đã sửa: BambooMacroTable -> vmkMacroTable
-    std::unordered_map<std::string, vmkMacroTable> macroTables_; 
+    std::unordered_map<std::string, vmkMacroTable> macroTables_;
     std::unordered_map<std::string, CGoObject> macroTableObject_;
 
-    FactoryFor<VMKState> factory_; 
+    FactoryFor<VMKState> factory_;
     std::vector<std::string> imNames_;
 
     std::unique_ptr<SimpleAction> inputMethodAction_;
     std::vector<std::unique_ptr<SimpleAction>> inputMethodSubAction_;
     std::unique_ptr<Menu> inputMethodMenu_;
-std::unique_ptr<fcitx::SimpleAction> modeAction_;
+    std::unique_ptr<fcitx::SimpleAction> modeAction_;
     std::unique_ptr<fcitx::Menu> modeMenu_;
     std::vector<std::unique_ptr<fcitx::SimpleAction>> modeSubAction_;
     std::unique_ptr<SimpleAction> charsetAction_;
     std::vector<std::unique_ptr<SimpleAction>> charsetSubAction_;
     std::unique_ptr<Menu> charsetMenu_;
-    
+
     std::unique_ptr<SimpleAction> spellCheckAction_;
     std::unique_ptr<SimpleAction> macroAction_;
     std::unique_ptr<SimpleAction> capitalizeMacroAction_;
@@ -191,11 +189,11 @@ std::unique_ptr<fcitx::SimpleAction> modeAction_;
 };
 
 class vmkFactory : public AddonFactory {
-public:
+  public:
     AddonInstance *create(AddonManager *manager) override {
         registerDomain("fcitx5-vmk", FCITX_INSTALL_LOCALEDIR);
         // Đã sửa: new BambooEngine -> new vmkEngine
-        return new vmkEngine(manager->instance()); 
+        return new vmkEngine(manager->instance());
     }
 };
 

@@ -109,7 +109,8 @@ int main(int argc, char *argv[]) {
     pin_to_pcore();
 
     std::string backspace_socket = "vmksocket-" + target_user + "-kb_socket";
-    std::string mouse_flag_socket = "vmksocket-" + target_user + "-mouse_socket";
+    std::string mouse_flag_socket =
+        "vmksocket-" + target_user + "-mouse_socket";
 
     // Setup Uinput
     uinput_fd_ = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
