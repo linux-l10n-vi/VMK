@@ -144,7 +144,6 @@ class vmkEngine final : public InputMethodEngine {
     void saveAppRules();
     void showAppModeMenu(InputContext *ic);
     void closeAppModeMenu();
-    VMKMode getGlobalMode() const { return globalMode_; }
 
   private:
     bool freeMarkingValue_ = true;
@@ -152,7 +151,6 @@ class vmkEngine final : public InputMethodEngine {
     vmkConfig config_;
     vmkCustomKeymap customKeymap_;
 
-    // Đã sửa: BambooMacroTable -> vmkMacroTable
     std::unordered_map<std::string, vmkMacroTable> macroTables_;
     std::unordered_map<std::string, CGoObject> macroTableObject_;
 
@@ -189,7 +187,6 @@ class vmkFactory : public AddonFactory {
   public:
     AddonInstance *create(AddonManager *manager) override {
         registerDomain("fcitx5-vmk", FCITX_INSTALL_LOCALEDIR);
-        // Đã sửa: new BambooEngine -> new vmkEngine
         return new vmkEngine(manager->instance());
     }
 };

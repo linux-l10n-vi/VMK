@@ -6,10 +6,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  */
-#ifndef _FCITX5_vmk_vmkCONFIG_H_ // ĐỔI TÊN HEADER GUARD
+#ifndef _FCITX5_vmk_vmkCONFIG_H_
 #define _FCITX5_vmk_vmkCONFIG_H_
 
-#include <algorithm> // Thêm thư viện này để đảm bảo std::find hoạt động
+#include <algorithm>
 #include <fcitx-config/configuration.h>
 #include <fcitx-config/option.h>
 #include <fcitx-utils/i18n.h>
@@ -107,7 +107,6 @@ struct InputMethodConstrain {
     const InputMethodOption *option_;
 };
 
-// ĐỔI TÊN CONFIGURATIONS
 FCITX_CONFIGURATION(vmkKeymap,
                     Option<std::string> key{this, "Key", _("Key"), ""};
                     Option<std::string> value{this, "Value", _("Value"), ""};);
@@ -119,8 +118,8 @@ FCITX_CONFIGURATION(
                "Macro",
                _("Macro"),
                {},
-               {}, // BẮT BUỘC: Thêm Constrain mặc định
-               {}, // BẮT BUỘC: Thêm Annotation mặc định
+               {},
+               {},
                ListDisplayOptionAnnotation("Key")};);
 
 FCITX_CONFIGURATION(
@@ -130,46 +129,31 @@ FCITX_CONFIGURATION(
                      "CustomKeymap",
                      _("Custom Keymap"),
                      {},
-                     {}, // BẮT BUỘC: Thêm Constrain mặc định
-                     {}, // BẮT BUỘC: Thêm Annotation mặc định
+                     {},
+                     {},
                      ListDisplayOptionAnnotation("Key")};);
-
-// ĐỔI TÊN CONFIGURATION CHÍNH
 
 FCITX_CONFIGURATION(
     vmkConfig,
 
     OptionWithAnnotation<std::string, ModeListAnnotation> mode{
         this, "Mode", _("Chế độ"), "vmk1", {}, {}, ModeListAnnotation()};
-    // KeyListOption restoreKeyStroke{this,
-    //"RestoreKeyStroke",
-    //  _("Restore Key Stroke"),
-    //  {},
-    //   KeyListConstrain()};
     Option<std::string, InputMethodConstrain, DefaultMarshaller<std::string>,
            InputMethodAnnotation>
-        inputMethod{
-            this,
-            "InputMethod",
-            _("Input Method"),
-            "Telex",
-            InputMethodConstrain(&inputMethod),
-            // BẮT BUỘC SỬA: Thêm đối số DefaultMarshaller (Marshaller mặc định)
-            {},
-            // BẮT BUỘC: Thêm đối số Annotation bị thiếu
-            InputMethodAnnotation()};
+        inputMethod{this,
+                    "InputMethod",
+                    _("Input Method"),
+                    "Telex",
+                    InputMethodConstrain(&inputMethod),
+                    {},
+                    InputMethodAnnotation()};
     OptionWithAnnotation<std::string, StringListAnnotation> outputCharset{
         this,
         "OutputCharset",
         _("Output Charset"),
         "Unicode",
-        // BẮT BUỘC SỬA: OptionWithAnnotation cần đủ 7 đối số trong trường hợp
-        // này:
-        // 5. Constrain (Mặc định: NoConstrain)
         {},
-        // 6. Marshaller (Mặc định: DefaultMarshaller)
         {},
-        // 7. Annotation
         StringListAnnotation()};
     Option<bool> spellCheck{this, "SpellCheck", _("Enable spell check"), true};
     Option<bool> macro{this, "Macro", _("Enable Macro"), true};
@@ -181,11 +165,7 @@ FCITX_CONFIGURATION(
     Option<bool> modernStyle{this, "ModernStyle",
                              _("Use oà, _uý (instead of òa, úy)"), false};
     Option<bool> freeMarking{this, "FreeMarking",
-                             _("Allow type with more freedom"), true};
-    // SubConfigOption custumKeymap{this, "CustomKeymap", _("Custom Keymap"),
-    // ĐỔI TÊN PATH
-    //  "fcitx://config/addon/vmk/custom_keymap"};
-); // Đóng FCITX_CONFIGURATION
+                             _("Allow type with more freedom"), true};);
 
 } // namespace fcitx
 

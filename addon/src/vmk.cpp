@@ -66,32 +66,19 @@
 
 fcitx::VMKMode E = fcitx::VMKMode::VMK1;
 std::atomic<int> Y{0};
-std::atomic<int> Y1{0};
 std::string BASE_SOCKET_PATH;
-std::string BASE_SOCKET_PATH_TEST;
-static const int MAX_SOCKET_ATTEMPTS = 10;
 // Global flag to signal mouse click for closing app mode menu
 static std::atomic<bool> g_mouse_clicked{false};
 
 std::atomic<int> is_deleting_{0};
-static std::string getLastUtf8Char(const std::string &str);
 static const int MAX_BACKSPACE_COUNT = 15;
-static void debugUtf8String(const std::string &str,
-                            const char *label = nullptr);
-static void debugUtf8String(const char *str, const char *label = nullptr);
 std::string SubstrChar(const std::string &s, size_t start, size_t len);
 int compareAndSplitStrings(const std::string &A, const std::string &B,
                            std::string &same, std::string &Adif,
                            std::string &Bdif);
-static std::atomic<bool> stopListenerThread{false};
 std::once_flag monitor_init_flag;
 std::atomic<bool> stop_flag_monitor{false};
-std::atomic<bool> has_reset{false};
-std::mutex mtx;
-std::condition_variable cv;
-extern std::string active_socket_path;
 std::atomic<bool> monitor_running{false};
-std::atomic<bool> stop_flag{false};
 int uinput_fd_ = -1;
 int uinput_client_fd_ = -1;
 int them = 0;
@@ -176,7 +163,7 @@ uintptr_t newMacroTable(const vmkMacroTable &macroTable) {
 
 std::vector<std::string> convertToStringList(char **array) {
     std::vector<std::string> result;
-    for (int i = 0; array[i]; i++) {
+    for (int i = 0; array[i]; ++i) {
         result.push_back(array[i]);
         free(array[i]);
     }
@@ -193,7 +180,7 @@ static void DeletePreviousNChars(fcitx::InputContext *ic, size_t n,
         ic->deleteSurroundingText(offset, static_cast<int>(n));
         return;
     }
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; ++i) {
         fcitx::Key key(FcitxKey_BackSpace);
         ic->forwardKey(key, false);
         ic->forwardKey(key, true);
@@ -302,14 +289,6 @@ class VMKState final : public InputContextProperty {
 
     int setup_uinput() { return connect_uinput_server() ? uinput_fd_ : -1; }
 
-    void cleanup_uinput() {
-        if (uinput_client_fd_ >= 0) {
-            close(uinput_client_fd_);
-            uinput_client_fd_ = -1;
-            uinput_fd_ = -1;
-        }
-    }
-
     void send_backspace_uinput(int count) {
         if (uinput_fd_ < 0 && !connect_uinput_server())
             return;
@@ -340,23 +319,6 @@ class VMKState final : public InputContextProperty {
             }
         }
         return false;
-    }
-
-    std::string sanitizeHistory(const std::string &raw) {
-        std::string clean = "";
-        for (size_t i = 0; i < raw.length();) {
-            if (i + 2 < raw.length() && raw.substr(i, 3) == "\\b\\") {
-                clean += "\\b\\";
-                i += 3;
-            } else {
-                unsigned char c = static_cast<unsigned char>(raw[i]);
-                if (c >= 32 && c <= 126) {
-                    clean += raw[i];
-                }
-                i += 1;
-            }
-        }
-        return clean;
     }
 
     void replayBufferToEngine(const std::string &buffer) {
@@ -640,18 +602,11 @@ class VMKState final : public InputContextProperty {
 
     void reset() {
         is_deleting_.store(0);
-        oldPreBuffer_.clear();
-        expected_backspaces_ = 0;
-        current_backspace_count_ = 0;
-        pending_commit_string_.clear();
-        current_thread_id_.store(0);
-        history_.clear();
+        clearAllBuffers();
 
         switch (E) {
         case fcitx::VMKMode::Preedit: {
             ic_->inputPanel().reset();
-            if (vmkEngine_)
-                ResetEngine(vmkEngine_.handle());
             ic_->updateUserInterface(UserInterfaceComponent::InputPanel);
             ic_->updatePreedit();
             break;
@@ -660,8 +615,6 @@ class VMKState final : public InputContextProperty {
         case fcitx::VMKMode::VMK1:
         case fcitx::VMKMode::VMK1HC: {
             ic_->inputPanel().reset();
-            if (vmkEngine_)
-                ResetEngine(vmkEngine_.handle());
             break;
         }
         default: {
@@ -1214,8 +1167,6 @@ void vmkEngine::deactivate(const InputMethodEntry &entry,
         else
             state->reset();
     } else {
-        // Xóa sạch buffer preedit và các biến liên quan khi chuyển app cho mọi
-        // mode khác
         state->clearAllBuffers();
         is_deleting_.store(0);
         Y.store(0);
@@ -1434,15 +1385,6 @@ void vmkEngine::showAppModeMenu(InputContext *ic) {
 
 FCITX_ADDON_FACTORY(fcitx::vmkFactory)
 
-static std::string getLastUtf8Char(const std::string &str) {
-    if (str.empty())
-        return "";
-    size_t pos = str.size() - 1;
-    while (pos > 0 && (static_cast<unsigned char>(str[pos]) & 0xC0) == 0x80)
-        --pos;
-    return str.substr(pos);
-}
-
 std::string SubstrChar(const std::string &s, size_t start, size_t len) {
     if (s.empty())
         return "";
@@ -1472,7 +1414,7 @@ int compareAndSplitStrings(const std::string &A, const std::string &B,
         unsigned int lenA = fcitx_utf8_char_len(ptrA);
         unsigned int lenB = fcitx_utf8_char_len(ptrB);
         if (lenA == lenB && std::strncmp(ptrA, ptrB, lenA) == 0)
-            matchLength++;
+            ++matchLength;
         else
             break;
     }
@@ -1480,40 +1422,4 @@ int compareAndSplitStrings(const std::string &A, const std::string &B,
     Adif = SubstrChar(A, matchLength, std::string::npos);
     Bdif = SubstrChar(B, matchLength, std::string::npos);
     return (Adif.empty() && Bdif.empty()) ? 1 : 2;
-}
-
-std::string customUtf8Substr(const std::string &str, size_t offset,
-                             size_t len) {
-    if (offset == 0 && len == std::string::npos)
-        return str;
-    size_t byte_start = 0, char_count = 0;
-    for (size_t i = 0; i < str.length(); ++i) {
-        if (char_count == offset) {
-            byte_start = i;
-            break;
-        }
-        if ((str[i] & 0xC0) != 0x80)
-            char_count++;
-    }
-    if (char_count < offset)
-        return "";
-    if (len == std::string::npos)
-        return str.substr(byte_start);
-    size_t byte_len = 0, char_len_count = 0;
-    for (size_t i = byte_start; i < str.length(); ++i) {
-        if (char_len_count == len)
-            break;
-        if ((str[i] & 0xC0) != 0x80)
-            char_len_count++;
-        byte_len++;
-    }
-    return str.substr(byte_start, byte_len);
-}
-
-size_t customUtf8Length(const std::string &str) {
-    size_t length = 0;
-    for (size_t i = 0; i < str.length(); ++i)
-        if ((str[i] & 0xC0) != 0x80)
-            length++;
-    return length;
 }
