@@ -43,7 +43,9 @@ jobs:
     - name: Create tarball structure
       run: |
         mkdir -p dist
-        sudo make install DESTDIR=$(pwd)/dist PREFIX=/usr
+        cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib .
+        make
+        make install DESTDIR=$(pwd)/dist
 
         ls -R dist/
 
