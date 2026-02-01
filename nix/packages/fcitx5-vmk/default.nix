@@ -52,7 +52,8 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     runHook preBuild
-    make build
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib .
+    make
     runHook postBuild
   '';
 

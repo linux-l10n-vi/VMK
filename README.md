@@ -151,11 +151,11 @@ git clone https://github.com/nhktmdzhg/VMK.git
 cd VMK
 
 # Biên dịch
-make build
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib . # Tùy vào máy mà LIBDIR sẽ khác nhau
+make
 
 # Cài đặt (cần quyền root)
-sudo make install LIBDIR=/usr/lib
-# LIBDIR tùy vào distro, thường là /usr/lib, nhưng chưa chắc distro nào cũng vậy, ví dụ như debian thì chơi kiểu khác với Arch
+sudo make install
 
 # Hoặc cài đặt vào thư mục tùy chỉnh
 sudo make install PREFIX=/usr/local
