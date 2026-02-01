@@ -1,3 +1,5 @@
+find_package(simdjson REQUIRED)
+
 set(fcitx_vmk_sources
   vmk.cpp
 )
@@ -10,6 +12,7 @@ target_link_libraries(vmk
 	Bamboo::Core
 	Pthread::Pthread
 	X11::X11
+	simdjson::simdjson
 )
 
 target_include_directories(vmk PRIVATE ${PROJECT_BINARY_DIR})

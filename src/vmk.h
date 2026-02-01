@@ -11,6 +11,7 @@
 
 #include "bamboo-core.h"
 #include "vmk-config.h"
+#include "emoji.h"
 #include <fcitx-config/iniparser.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx/action.h>
@@ -189,6 +190,7 @@ namespace fcitx {
         bool                                            isSelectingAppMode_ = false;
         std::string                                     currentConfigureApp_;
         VMKMode                                         globalMode_;
+        EmojiLoader                                     emojiLoader_;
     };
 
     class vmkFactory : public AddonFactory {

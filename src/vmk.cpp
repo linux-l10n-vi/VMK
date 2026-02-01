@@ -750,6 +750,10 @@ namespace fcitx {
     }
 
     vmkEngine::vmkEngine(Instance* instance) : instance_(instance), factory_([this](InputContext& ic) { return new VMKState(this, &ic); }) {
+        std::string emojiPath = StandardPath::global().open(StandardPath::Type::PkgData, "vmk/emoji.json", O_RDONLY);
+        if (!emojiLoader_.load(emojiPath)) {
+            std::cerr << "[VMK Emoji] Failed to load emojis from: " << emojiPath << std::endl;
+        }
         startMonitoringOnce();
         Init();
         {
@@ -1081,6 +1085,9 @@ namespace fcitx {
                     saveAppRules();
                 }
                 selectionMade = true;
+            } else if (keyEvent.key().check(FcitxKey_7)) {
+                selectedMode  = fcitx::VMKMode::Emoji;
+                selectionMade = true;
             } else if (keyEvent.key().check(FcitxKey_Escape)) {
                 selectionMade = true;
             } else if (keyEvent.key().check(FcitxKey_grave)) {
@@ -1094,8 +1101,10 @@ namespace fcitx {
             }
 
             if (selectedMode != fcitx::VMKMode::NoMode) {
-                appRules_[currentConfigureApp_] = selectedMode;
-                saveAppRules();
+                if (selectedMode != fcitx::VMKMode::Emoji) {
+                    appRules_[currentConfigureApp_] = selectedMode;
+                    saveAppRules();
+                }
 
                 realMode      = selectedMode;
                 selectionMade = true;
@@ -1325,6 +1334,7 @@ namespace fcitx {
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::VMK1HC, "4. VMK1HC")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::Off, "5. OFF - Disable Input Method")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("6. Remove app settings")));
+        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("7. Emoji mode")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("`. Close menu and type `")));
 
         ic->inputPanel().reset();
