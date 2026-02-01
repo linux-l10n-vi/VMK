@@ -718,7 +718,7 @@ namespace fcitx {
         auto& uiManager = instance_->userInterfaceManager();
         modeAction_     = std::make_unique<SimpleAction>();
         modeAction_->setIcon("preferences-system");
-        modeAction_->setShortText(_("Chế độ gõ"));
+        modeAction_->setShortText(_("Typing Mode"));
         uiManager.registerAction("vmk-mode", modeAction_.get());
         modeMenu_ = std::make_unique<Menu>();
         modeAction_->setMenu(modeMenu_.get());
@@ -750,7 +750,7 @@ namespace fcitx {
 
         inputMethodAction_ = std::make_unique<SimpleAction>();
         inputMethodAction_->setIcon("document-edit");
-        inputMethodAction_->setShortText("Kiểu gõ");
+        inputMethodAction_->setShortText("Input Method");
         uiManager.registerAction("vmk-input-method", inputMethodAction_.get());
         inputMethodMenu_ = std::make_unique<Menu>();
         inputMethodAction_->setMenu(inputMethodMenu_.get());
@@ -775,7 +775,7 @@ namespace fcitx {
         }
 
         charsetAction_ = std::make_unique<SimpleAction>();
-        charsetAction_->setShortText(_("Bảng mã"));
+        charsetAction_->setShortText(_("Charset"));
         charsetAction_->setIcon("character-set");
         uiManager.registerAction("vmk-charset", charsetAction_.get());
         charsetMenu_ = std::make_unique<Menu>();
@@ -1133,7 +1133,7 @@ namespace fcitx {
             if (ic)
                 action->update(ic);
         }
-        modeAction_->setLongText(_("Chế độ gõ: ") + currentModeStr);
+        modeAction_->setLongText(_("Typing Mode: ") + currentModeStr);
 
         if (ic) {
             modeAction_->update(ic);
@@ -1164,7 +1164,7 @@ namespace fcitx {
 
     void vmkEngine::updateSpellAction(InputContext* ic) {
         spellCheckAction_->setChecked(*config_.spellCheck);
-        spellCheckAction_->setShortText(*config_.spellCheck ? _("Spell Check: Bật") : _("Spell Check: Tắt"));
+        spellCheckAction_->setShortText(*config_.spellCheck ? _("Spell Check: On") : _("Spell Check: Off"));
         if (ic) {
             spellCheckAction_->update(ic);
         }
@@ -1172,7 +1172,7 @@ namespace fcitx {
 
     void vmkEngine::updateMacroAction(InputContext* ic) {
         macroAction_->setChecked(*config_.macro);
-        macroAction_->setShortText(*config_.macro ? _("Macro: Bật") : _("Macro: Tắt"));
+        macroAction_->setShortText(*config_.macro ? _("Macro: On") : _("Macro: Off"));
         if (ic) {
             macroAction_->update(ic);
         }
@@ -1180,7 +1180,7 @@ namespace fcitx {
 
     void vmkEngine::updateCapitalizeMacroAction(InputContext* ic) {
         capitalizeMacroAction_->setChecked(*config_.capitalizeMacro);
-        capitalizeMacroAction_->setShortText(*config_.capitalizeMacro ? _("Capitalize Macro: Bật") : _("Capitalize Macro: Tắt"));
+        capitalizeMacroAction_->setShortText(*config_.capitalizeMacro ? _("Capitalize Macro: On") : _("Capitalize Macro: Off"));
         if (ic) {
             capitalizeMacroAction_->update(ic);
         }
@@ -1188,7 +1188,7 @@ namespace fcitx {
 
     void vmkEngine::updateAutoNonVnRestoreAction(InputContext* ic) {
         autoNonVnRestoreAction_->setChecked(*config_.autoNonVnRestore);
-        autoNonVnRestoreAction_->setShortText(*config_.autoNonVnRestore ? _("Auto Non-VN Restore: Bật") : _("Auto Non-VN Restore: Tắt"));
+        autoNonVnRestoreAction_->setShortText(*config_.autoNonVnRestore ? _("Auto Non-VN Restore: On") : _("Auto Non-VN Restore: Off"));
         if (ic) {
             autoNonVnRestoreAction_->update(ic);
         }
@@ -1196,7 +1196,7 @@ namespace fcitx {
 
     void vmkEngine::updateModernStyleAction(InputContext* ic) {
         modernStyleAction_->setChecked(*config_.modernStyle);
-        modernStyleAction_->setShortText(*config_.modernStyle ? _("Modern Style: Bật") : _("Modern Style: Tắt"));
+        modernStyleAction_->setShortText(*config_.modernStyle ? _("Modern Style: On") : _("Modern Style: Off"));
         if (ic) {
             modernStyleAction_->update(ic);
         }
@@ -1204,7 +1204,7 @@ namespace fcitx {
 
     void vmkEngine::updateFreeMarkingAction(InputContext* ic) {
         freeMarkingAction_->setChecked(*config_.freeMarking);
-        freeMarkingAction_->setShortText(*config_.freeMarking ? _("Free Marking: Bật") : _("Free Marking: Tắt"));
+        freeMarkingAction_->setShortText(*config_.freeMarking ? _("Free Marking: On") : _("Free Marking: Off"));
         if (ic) {
             freeMarkingAction_->update(ic);
         }
@@ -1264,20 +1264,20 @@ namespace fcitx {
 
         auto getLabel = [&](const fcitx::VMKMode& modeName, const std::string& modeLabel) {
             if (modeName == currentAppRules) {
-                return Text(modeLabel + " (Mặc định)");
+                return Text(modeLabel + " (Default)");
             } else {
                 return Text(modeLabel);
             }
         };
 
-        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("Tên app nhận diện được bởi fcitx5: " + currentConfigureApp_)));
+        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("App name detected by fcitx5: " + currentConfigureApp_)));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::VMK1, "1. Fake backspace by Uinput")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::VMK2, "2. Surrounding Text")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::Preedit, "3. Preedit")));
         candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::VMK1HC, "4. VMK1HC")));
-        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::Off, "5. OFF - Tắt bộ gõ")));
-        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("6. Xóa thiết lập cho app")));
-        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("`. Tắt menu và gõ `")));
+        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(getLabel(fcitx::VMKMode::Off, "5. OFF - Disable Input Method")));
+        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("6. Remove app settings")));
+        candidateList->append(std::make_unique<DisplayOnlyCandidateWord>(Text("`. Close menu and type `")));
 
         ic->inputPanel().reset();
         ic->inputPanel().setCandidateList(std::move(candidateList));

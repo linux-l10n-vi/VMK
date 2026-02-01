@@ -118,7 +118,7 @@ namespace fcitx {
     FCITX_CONFIGURATION(
         vmkConfig,
 
-        OptionWithAnnotation<std::string, ModeListAnnotation>                                            mode{this, "Mode", _("Chế độ"), "vmk1", {}, {}, ModeListAnnotation()};
+        OptionWithAnnotation<std::string, ModeListAnnotation>                                            mode{this, "Mode", _("Mode"), "vmk1", {}, {}, ModeListAnnotation()};
         Option<std::string, InputMethodConstrain, DefaultMarshaller<std::string>, InputMethodAnnotation> inputMethod{
             this, "InputMethod", _("Input Method"), "Telex", InputMethodConstrain(&inputMethod), {}, InputMethodAnnotation()};
         OptionWithAnnotation<std::string, StringListAnnotation> outputCharset{this, "OutputCharset", _("Output Charset"), "Unicode", {}, {}, StringListAnnotation()};

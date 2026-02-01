@@ -1,170 +1,131 @@
 # Vietnamese translations for fcitx5-bamboo package.
-# Copyright (C) 2026 THE fcitx5-bamboo'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the fcitx5-bamboo package.
-#
-# Translators:
-# Zen Fas, 2022
+# Copyright (C) 2026 THE fcitx5-vmk'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the fcitx5-vmk package.
+# Automatically generated, 2026.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fcitx5-bamboo\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-31 18:05+0700\n"
-"PO-Revision-Date: 2022-06-04 06:04+0000\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: nhktmdzhg@gmail.com\n"
+"POT-Creation-Date: 2026-02-01 12:10+0700\n"
+"PO-Revision-Date: 2026-02-01 12:21+0700\n"
 "Last-Translator: Automatically generated\n"
-"Language-Team: Vietnamese (https://www.transifex.com/fcitx/teams/12005/vi/)\n"
+"Language-Team: none\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.8\n"
 
-#: src/vmk.cpp:812
-msgid "Chế độ gõ"
-msgstr ""
-
-#: src/vmk.cpp:877
-msgid "Bảng mã"
-msgstr ""
-
-#: src/vmk.cpp:908 src/vmkconfig.h:174
-msgid "Enable spell check"
-msgstr "Bật kiểm tra chính tả"
-
-#: src/vmk.cpp:922 src/vmkconfig.h:175
-msgid "Enable Macro"
-msgstr "Cho phép gõ tắt"
-
-#: src/vmk.cpp:935 src/vmkconfig.h:176
-msgid "Capitalize Macro"
-msgstr "Gõ tắt chữ hoa"
-
-#: src/vmk.cpp:951 src/vmkconfig.h:179
-msgid "Auto restore keys with invalid words"
-msgstr "Tự động khôi phục phím với từ sai"
-
-#: src/vmk.cpp:966 src/vmkconfig.h:182
-msgid "Use oà, _uý (instead of òa, úy)"
-msgstr "Sử dụng oà, _uý (thay vì òa, úy)"
-
-#: src/vmk.cpp:980 src/vmkconfig.h:184
-msgid "Allow type with more freedom"
-msgstr "Cho phép gõ tự do"
-
-#: src/vmk.cpp:1263
-msgid "Chế độ gõ: "
-msgstr ""
-
-#: src/vmk.cpp:1298
-#, fuzzy
-#| msgid "Spell check"
-msgid "Spell Check: Bật"
-msgstr "Kiểm tra chính tả"
-
-#: src/vmk.cpp:1298
-#, fuzzy
-#| msgid "Spell check"
-msgid "Spell Check: Tắt"
-msgstr "Kiểm tra chính tả"
-
-#: src/vmk.cpp:1306
-msgid "Macro: Bật"
-msgstr ""
-
-#: src/vmk.cpp:1307
-msgid "Macro: Tắt"
-msgstr ""
-
-#: src/vmk.cpp:1316
-#, fuzzy
-#| msgid "Capitalize Macro"
-msgid "Capitalize Macro: Bật"
-msgstr "Gõ tắt chữ hoa"
-
-#: src/vmk.cpp:1317
-#, fuzzy
-#| msgid "Capitalize Macro"
-msgid "Capitalize Macro: Tắt"
-msgstr "Gõ tắt chữ hoa"
-
-#: src/vmk.cpp:1326
-msgid "Auto Non-VN Restore: Bật"
-msgstr ""
-
-#: src/vmk.cpp:1327
-msgid "Auto Non-VN Restore: Tắt"
-msgstr ""
-
-#: src/vmk.cpp:1336
-msgid "Modern Style: Bật"
-msgstr ""
-
-#: src/vmk.cpp:1336
-msgid "Modern Style: Tắt"
-msgstr ""
-
-#: src/vmk.cpp:1345
-msgid "Free Marking: Bật"
-msgstr ""
-
-#: src/vmk.cpp:1345
-msgid "Free Marking: Tắt"
-msgstr ""
-
-#: src/vmkconfig.h:112
+#: src/vmk-config.h:108
 msgid "Key"
 msgstr "Phím"
 
-#: src/vmkconfig.h:113
+#: src/vmk-config.h:108
 msgid "Value"
 msgstr "Giá trị"
 
-#: src/vmkconfig.h:120
+#: src/vmk-config.h:112
 msgid "Macro"
 msgstr "Gõ tắt"
 
-#: src/vmkconfig.h:131
+#: src/vmk-config.h:116
 msgid "Custom Keymap"
-msgstr "Bàn phím tùy chỉnh"
+msgstr "Keymap tùy chỉnh"
 
-#: src/vmkconfig.h:143
-msgid "Chế độ"
-msgstr ""
+#: src/vmk-config.h:121
+msgid "Mode"
+msgstr "Chế độ"
 
-#: src/vmkconfig.h:154
+#: src/vmk-config.h:123
 msgid "Input Method"
 msgstr "Kiểu gõ"
 
-#: src/vmkconfig.h:164
+#: src/vmk-config.h:124
 msgid "Output Charset"
-msgstr "Bảng Mã"
+msgstr "Bảng mã"
 
-#~ msgid "Vmk"
-#~ msgstr "Vmk"
+#: src/vmk-config.h:125 src/vmk.cpp:806
+msgid "Enable spell check"
+msgstr "Bật kiểm tra chính tả"
 
-#~ msgid "Vmk Wrapper For Fcitx"
-#~ msgstr "Bộ gõ Bamboo cho Fcitx"
+#: src/vmk-config.h:125 src/vmk.cpp:818
+msgid "Enable Macro"
+msgstr "Bật gõ tắt"
 
-#~ msgid "Macro Disabled"
-#~ msgstr "Gõ tắt bị tắt"
+#: src/vmk-config.h:126 src/vmk.cpp:830
+msgid "Capitalize Macro"
+msgstr "Gõ tắt chữ hoa"
 
-#~ msgid "Macro Enabled"
-#~ msgstr "Gõ tắt đang mở"
+#: src/vmk-config.h:127 src/vmk.cpp:842
+msgid "Auto restore keys with invalid words"
+msgstr "Tự động khôi phục phím với từ sai"
 
-#~ msgid "Output charset"
-#~ msgstr "Bảng mã"
+#: src/vmk-config.h:128 src/vmk.cpp:854
+msgid "Use oà, _uý (instead of òa, úy)"
+msgstr "Dùng oà, _uý (thay vì òa, úy)"
 
-#~ msgid "Restore Key Stroke"
-#~ msgstr "Khôi phục phím bấm"
+#: src/vmk-config.h:129 src/vmk.cpp:866
+msgid "Allow type with more freedom"
+msgstr "Cho phép gõ dấu tự do"
 
-#~ msgid "Spell Check Disabled"
-#~ msgstr "Kiểm tra chính tả bị tắt"
+#: src/vmk.cpp:721
+msgid "Typing Mode"
+msgstr "Chế độ gõ"
 
-#~ msgid "Spell Check Enabled"
-#~ msgstr "Kiểm tra chính tả đang mở"
+#: src/vmk.cpp:778
+msgid "Charset"
+msgstr "Bảng mã"
 
-#~ msgid "Underline the preedit text"
-#~ msgstr "Gạch chân từ đang viết"
+#: src/vmk.cpp:1136
+msgid "Typing Mode: "
+msgstr "Chế độ gõ:"
 
-#~ msgid "Vietnamese input method"
-#~ msgstr "Kiểu gõ tiếng Việt"
+#: src/vmk.cpp:1167
+msgid "Spell Check: On"
+msgstr "Kiểm tra chính tả: Bật"
+
+#: src/vmk.cpp:1167
+msgid "Spell Check: Off"
+msgstr "Kiểm tra chính tả: Tắt"
+
+#: src/vmk.cpp:1175
+msgid "Macro: On"
+msgstr "Phím tắt: Bật"
+
+#: src/vmk.cpp:1175
+msgid "Macro: Off"
+msgstr "Phím tắt: Tắt"
+
+#: src/vmk.cpp:1183
+msgid "Capitalize Macro: On"
+msgstr "Gõ tắt chữ hoa: Bật"
+
+#: src/vmk.cpp:1183
+msgid "Capitalize Macro: Off"
+msgstr "Gõ tắt chữ hoa: Tắt"
+
+#: src/vmk.cpp:1191
+msgid "Auto Non-VN Restore: On"
+msgstr "Tự động khôi phục với từ sai: Bật"
+
+#: src/vmk.cpp:1191
+msgid "Auto Non-VN Restore: Off"
+msgstr "Tự động khôi phục với từ sai: Tắt"
+
+#: src/vmk.cpp:1199
+msgid "Modern Style: On"
+msgstr "Dấu chuẩn: Bật"
+
+#: src/vmk.cpp:1199
+msgid "Modern Style: Off"
+msgstr "Dấu chuẩn: Tắt"
+
+#: src/vmk.cpp:1207
+msgid "Free Marking: On"
+msgstr "Dấu tự do: Bật"
+
+#: src/vmk.cpp:1207
+msgid "Free Marking: Off"
+msgstr "Dấu tự do: Tắt"

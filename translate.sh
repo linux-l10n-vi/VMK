@@ -1,5 +1,5 @@
 msginit \
   --input=po/fcitx5-vmk.pot \
-  --locale=en_US \
+  --locale=vi_VN \
   --output-file=po/vi.po \
   --no-translator
