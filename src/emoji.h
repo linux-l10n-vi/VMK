@@ -123,7 +123,7 @@ class EmojiLoader {
         return true;
     }
 
-    std::vector<EmojiEntry> search(const std::string& prefix, size_t numResult) {
+    std::vector<EmojiEntry> search(const std::string& prefix) {
         std::vector<EmojiEntry> results;
 
         if (emojiList.empty())
@@ -135,8 +135,6 @@ class EmojiLoader {
         auto it = std::lower_bound(emojiList.begin(), emojiList.end(), target);
 
         for (; it != emojiList.end(); ++it) {
-            if (results.size() >= numResult)
-                break;
 
             if (it->trigger.compare(0, prefix.size(), prefix) != 0) {
                 break;

@@ -390,40 +390,57 @@ namespace fcitx {
                 int offset      = currentSym - FcitxKey_1;
                 int globalIndex = commonList->currentPage() * commonList->pageSize() + offset;
 
-                if (globalIndex < (int)commonList->size()) {
-                    commonList->candidate(globalIndex).select(ic_);
+                if (globalIndex < (int)commonList->totalSize()) {
+                    commonList->candidateFromAll(globalIndex).select(ic_);
                     keyEvent.filterAndAccept();
                     return;
                 }
             }
 
             if (commonList && !commonList->empty()) {
-                int  currentIndex = commonList->cursorIndex();
-                int  totalSize    = commonList->size();
-                int  pageSize     = commonList->pageSize();
-                int  currentPage  = commonList->currentPage();
-                int  totalPages   = (totalSize + pageSize - 1) / pageSize;
+                int  globalCursorIndex = commonList->globalCursorIndex();
+                int  totalSize         = commonList->totalSize();
+                int  currentPage       = commonList->currentPage();
+                int  pageSize          = commonList->pageSize();
+                int  localCursorIndex  = globalCursorIndex - currentPage * pageSize;
 
                 bool handled = false;
 
                 if (currentSym == FcitxKey_Tab || currentSym == FcitxKey_Down) {
-                    int nextIndex = (currentIndex + 1) % totalSize;
-                    commonList->setCursorIndex(nextIndex);
+                    if (globalCursorIndex == totalSize - 1) {
+                        commonList->setGlobalCursorIndex(globalCursorIndex);
+                    } else if (localCursorIndex < pageSize - 1) {
+                        commonList->setGlobalCursorIndex(globalCursorIndex + 1);
+                    } else {
+                        commonList->next();
+                        int newPage = commonList->currentPage();
+                        commonList->setGlobalCursorIndex(newPage * pageSize);
+                    }
                     handled = true;
                 } else if (currentSym == FcitxKey_ISO_Left_Tab || currentSym == FcitxKey_Up) {
-                    int prevIndex = (currentIndex - 1 + totalSize) % totalSize;
-                    commonList->setCursorIndex(prevIndex);
+                    if (globalCursorIndex == 0) {
+                        commonList->setGlobalCursorIndex(globalCursorIndex);
+                    } else if (localCursorIndex > 0) {
+                        commonList->setGlobalCursorIndex(globalCursorIndex - 1);
+                    } else {
+                        commonList->prev();
+                        int newPage  = commonList->currentPage();
+                        int newIndex = newPage * pageSize + pageSize - 1;
+                        commonList->setGlobalCursorIndex(newIndex);
+                    }
                     handled = true;
-                } else if (currentSym == FcitxKey_Page_Down) {
-                    if (currentPage < totalPages - 1) {
-                        commonList->setPage(currentPage + 1);
-                        commonList->setCursorIndex((currentPage + 1) * pageSize);
+                } else if (currentSym == FcitxKey_Page_Down || currentSym == FcitxKey_Right) {
+                    if (commonList->hasNext()) {
+                        commonList->next();
+                        int newPage = commonList->currentPage();
+                        commonList->setGlobalCursorIndex(newPage * pageSize);
                         handled = true;
                     }
-                } else if (currentSym == FcitxKey_Page_Up) {
-                    if (currentPage > 0) {
-                        commonList->setPage(currentPage - 1);
-                        commonList->setCursorIndex((currentPage - 1) * pageSize);
+                } else if (currentSym == FcitxKey_Page_Up || currentSym == FcitxKey_Left) {
+                    if (commonList->hasPrev()) {
+                        commonList->prev();
+                        int newPage = commonList->currentPage();
+                        commonList->setGlobalCursorIndex(newPage * pageSize);
                         handled = true;
                     }
                 }
@@ -451,9 +468,9 @@ namespace fcitx {
 
             if (currentSym == FcitxKey_space || currentSym == FcitxKey_Return) {
                 if (commonList && !commonList->empty()) {
-                    int idx = commonList->cursorIndex();
+                    int globalIdx = commonList->globalCursorIndex();
 
-                    commonList->candidate(idx).select(ic_);
+                    commonList->candidateFromAll(globalIdx).select(ic_);
 
                     keyEvent.filterAndAccept();
                 } else if (currentSym == FcitxKey_Return && !emojiBuffer_.empty()) {
@@ -505,7 +522,7 @@ namespace fcitx {
                 return;
             }
 
-            emojiCandidates_ = engine_->emojiLoader().search(emojiBuffer_, 10);
+            emojiCandidates_ = engine_->emojiLoader().search(emojiBuffer_);
 
             if (!emojiBuffer_.empty()) {
                 Text preeditText;
@@ -520,15 +537,13 @@ namespace fcitx {
             if (!emojiCandidates_.empty()) {
                 auto candidateList = std::make_unique<CommonCandidateList>();
                 candidateList->setLayoutHint(CandidateLayoutHint::Vertical);
-                candidateList->setPageSize(10);
+                candidateList->setPageSize(9);
 
-                for (const auto& emoji : emojiCandidates_) {
-                    std::string label     = emoji.trigger;
-                    std::string emojiText = emoji.output;
-                    Text        displayLabel(emojiText + " " + label);
-                    candidateList->append(std::make_unique<EmojiCandidateWord>(displayLabel, this, emojiText));
+                for (int i = 0; i < emojiCandidates_.size(); ++i) {
+                    int  localIndex = i % 9 + 1;
+                    Text displayLabel(std::to_string(localIndex) + ": " + emojiCandidates_[i].trigger + " " + emojiCandidates_[i].output);
+                    candidateList->append(std::make_unique<EmojiCandidateWord>(displayLabel, this, emojiCandidates_[i].output));
                 }
-
                 candidateList->setCursorIndex(0);
 
                 ic_->inputPanel().setCandidateList(std::move(candidateList));
