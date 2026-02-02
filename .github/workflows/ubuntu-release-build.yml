@@ -46,6 +46,7 @@ jobs:
     - name: Create tarball structure
       run: |
         mkdir -p dist
+        export LDFLAGS="-Wl,-z,relro -Wl,-z,now $LDFLAGS"
         cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib .
         make -j$(nproc)
         make install DESTDIR=$(pwd)/dist
