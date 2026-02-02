@@ -544,7 +544,7 @@ namespace fcitx {
                     Text displayLabel(std::to_string(localIndex) + ": " + emojiCandidates_[i].trigger + " " + emojiCandidates_[i].output);
                     candidateList->append(std::make_unique<EmojiCandidateWord>(displayLabel, this, emojiCandidates_[i].output));
                 }
-                candidateList->setCursorIndex(0);
+                candidateList->setGlobalCursorIndex(0);
 
                 ic_->inputPanel().setCandidateList(std::move(candidateList));
             } else {
