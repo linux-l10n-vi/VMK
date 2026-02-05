@@ -8,6 +8,7 @@
  */
 #include "vmk.h"
 
+#include <cstdint>
 #include <fcitx-config/iniparser.h>
 #include <fcitx-utils/charutils.h>
 #include <fcitx-utils/event.h>
@@ -33,7 +34,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
-#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -165,31 +165,6 @@ namespace fcitx {
             return result;
         }
 
-        static void DeletePreviousNChars(InputContext* ic, size_t n, Instance* instance) {
-            if (!ic || !instance || n == 0)
-                return;
-            if (ic->capabilityFlags().test(CapabilityFlag::SurroundingText)) {
-                int offset = -static_cast<int>(n);
-                ic->deleteSurroundingText(offset, static_cast<int>(n));
-                return;
-            }
-            for (size_t i = 0; i < n; ++i) {
-                Key key(FcitxKey_BackSpace);
-                ic->forwardKey(key, false);
-                ic->forwardKey(key, true);
-            }
-        }
-
-        bool isValidStateCharacter(uint32_t ucs4) {
-            if ((ucs4 >= 'a' && ucs4 <= 'z') || (ucs4 >= 'A' && ucs4 <= 'Z') || (ucs4 >= '0' && ucs4 <= '9')) {
-                return true;
-            }
-            if (ucs4 >= 0xC0)
-                return true;
-
-            return false;
-        }
-
         bool isWordBreak(uint32_t ucs4) {
             return ucs4 == ' ' || ucs4 == '\t' || ucs4 == '\n' || ucs4 == '\r' || ucs4 == 0 || // Null char
                 (ucs4 < 65 && ucs4 > 57);
@@ -308,11 +283,11 @@ namespace fcitx {
                 return;
 
             ResetEngine(vmkEngine_.handle());
-            for (char raw_char : buffer) {
-                if (raw_char == 0x07) {
+            for (uint32_t c : fcitx::utf8::MakeUTF8CharRange(buffer)) {
+                if (c == static_cast<uint32_t>('\b')) {
                     EngineProcessKeyEvent(vmkEngine_.handle(), FcitxKey_BackSpace, 0);
                 } else {
-                    EngineProcessKeyEvent(vmkEngine_.handle(), (uint32_t)raw_char, 0);
+                    EngineProcessKeyEvent(vmkEngine_.handle(), c, 0);
                 }
             }
         }
@@ -670,7 +645,7 @@ namespace fcitx {
 
             if (isBackspace(currentSym) || currentSym == FcitxKey_Return) {
                 if (isBackspace(currentSym)) {
-                    history_.push_back(static_cast<char>(0x07));
+                    history_.push_back('\b');
                     replayBufferToEngine(history_);
                     UniqueCPtr<char> preeditC(EnginePullPreedit(vmkEngine_.handle()));
                     oldPreBuffer_ = (preeditC && preeditC.get()[0]) ? preeditC.get() : "";
@@ -766,14 +741,12 @@ namespace fcitx {
         void handleSurroundingText(KeyEvent& keyEvent) {
             auto ic = keyEvent.inputContext();
             if (!ic || !ic->capabilityFlags().test(CapabilityFlag::SurroundingText)) {
-                std::cout << "Don't support Surrounding Text" << std::endl;
                 keyEvent.forward();
                 return;
             }
 
             const auto& surrounding = ic->surroundingText();
             if (!surrounding.isValid()) {
-                std::cout << "Surrounding Text is not valid" << std::endl;
                 keyEvent.forward();
                 return;
             }
@@ -784,11 +757,14 @@ namespace fcitx {
                 return;
             }
 
+            if (surrounding.anchor() != surrounding.cursor()) {
+                ic->deleteSurroundingText(0, 0);
+            }
+
             const std::string& text   = surrounding.text();
             int                cursor = surrounding.cursor();
 
             size_t             textLen = utf8::lengthValidated(text);
-            std::cout << "text: " << text << " | cursor: " << cursor << " | textLen: " << textLen << std::endl;
 
             if (textLen == utf8::INVALID_LENGTH || cursor <= 0 || cursor > (int)textLen) {
                 goto process_normal;
@@ -818,8 +794,6 @@ namespace fcitx {
 
                 std::string oldWord(startIter, endIter);
 
-                std::cout << "oldWord: " << oldWord << std::endl;
-
                 if (oldWord.empty()) {
                     goto process_normal;
                 }
@@ -833,7 +807,6 @@ namespace fcitx {
                 bool processed = EngineProcessKeyEvent(vmkEngine_.handle(), keyEvent.rawKey().sym(), keyEvent.rawKey().states());
 
                 if (!processed) {
-                    std::cout << "cannot process" << std::endl;
                     keyEvent.forward();
                     ResetEngine(vmkEngine_.handle());
                     return;
@@ -848,12 +821,8 @@ namespace fcitx {
                 if (preeditPtr && preeditPtr.get()[0])
                     newWord += preeditPtr.get();
 
-                std::cout << "newWord: " << newWord << std::endl;
-
                 std::string commonPrefix, deletedPart, addedPart;
                 compareAndSplitStrings(oldWord, newWord, commonPrefix, deletedPart, addedPart);
-                std::cout << "commonPrefix: " << commonPrefix << std::endl;
-                std::cout << "deletedPart: " << deletedPart << std::endl;
                 if (deletedPart.empty() && addedPart == keyEvent.key().toString()) {
                     ResetEngine(vmkEngine_.handle());
                     keyEvent.forward();
@@ -1144,7 +1113,7 @@ namespace fcitx {
             imNames_ = std::move(imNames);
         }
         config_.inputMethod.annotation().setList(imNames_);
-        auto fd = StandardPath::global().open(StandardPath::Type::PkgData, "vmk/vietnamese.cm.dict", O_RDONLY);
+        auto fd = StandardPaths::global().open(StandardPathsType::PkgData, "vmk/vietnamese.cm.dict");
         if (!fd.isValid())
             throw std::runtime_error("Failed to load dictionary");
         dictionary_.reset(NewDictionary(fd.release()));
@@ -1313,7 +1282,7 @@ namespace fcitx {
         updateModeAction(nullptr);
         instance_->inputContextManager().registerProperty("VMKState", &factory_);
 
-        std::string configDir = StandardPath::global().userDirectory(StandardPath::Type::Config) + "/fcitx5/conf";
+        std::string configDir = (StandardPaths::global().userDirectory(StandardPathsType::Config) / "fcitx5" / "conf").string();
         if (!std::filesystem::exists(configDir)) {
             std::filesystem::create_directories(configDir);
         }
