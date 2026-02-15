@@ -27,8 +27,19 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <vector>
+#include <signal.h>
+#include <atomic>
 // --- VARIABLES ---
-static int uinput_fd_ = -1;
+static int               uinput_fd_ = -1;
+static std::atomic<bool> g_running{true};
+
+// signal handler
+
+static void signal_handler(int sig) {
+    if (sig == SIGTERM || sig == SIGINT) {
+        g_running.store(false);
+    }
+}
 
 // get username
 std::string get_current_username() {
@@ -49,41 +60,25 @@ static void pin_to_pcore() {
     sched_setaffinity(0, sizeof(cpuset), &cpuset);
 }
 
-static inline void sleep_us(long us) {
-    struct timespec ts;
-    ts.tv_sec  = us / 1000000;
-    ts.tv_nsec = (us % 1000000) * 1000;
-    clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, nullptr);
-}
-
-// input injector functions
-static inline struct input_event make_event(int type, int code, int value) {
-    struct input_event ev{};
-    ev.type  = static_cast<unsigned short>(type);
-    ev.code  = static_cast<unsigned short>(code);
-    ev.value = value;
-    return ev;
-}
-
-void send_backspace_uinput(int count) {
-    if (uinput_fd_ < 0 || count <= 0)
+static void send_single_backspace() {
+    if (uinput_fd_ < 0)
         return;
-    if (count > 10)
-        count = 10;
+    struct input_event ev[2];
+    memset(ev, 0, sizeof(ev));
 
-    const int                INTER_KEY_DELAY_US = 1200;
+    // Press
+    ev[0].type  = EV_KEY;
+    ev[0].code  = KEY_BACKSPACE;
+    ev[0].value = 1;
 
-    const struct input_event cycle[4] = {
-        make_event(EV_KEY, KEY_BACKSPACE, 1),
-        make_event(EV_SYN, SYN_REPORT, 0),
-        make_event(EV_KEY, KEY_BACKSPACE, 0),
-        make_event(EV_SYN, SYN_REPORT, 0),
-    };
+    ev[1].type  = EV_SYN;
+    ev[1].code  = SYN_REPORT;
+    ev[1].value = 0;
+    write(uinput_fd_, ev, sizeof(ev));
 
-    for (int i = 0; i < count; ++i) {
-        write(uinput_fd_, cycle, sizeof(cycle));
-        sleep_us(INTER_KEY_DELAY_US);
-    }
+    // Release
+    ev[0].value = 0;
+    write(uinput_fd_, ev, sizeof(ev));
 }
 
 // LIBINPUT HELPERS
@@ -170,33 +165,50 @@ int main(int argc, char* argv[]) {
     libinput_udev_assign_seat(li, "seat0");
     int                        li_fd = libinput_get_fd(li);
 
-    std::vector<struct pollfd> fds(3);
-    fds[0].fd     = server_fd;
-    fds[0].events = POLLIN;
-    fds[1].fd     = li_fd;
-    fds[1].events = POLLIN;
-    fds[2].fd     = mouse_server_fd;
-    fds[2].events = POLLIN;
+    std::vector<struct pollfd> fds;
+    fds.push_back({server_fd, POLLIN, 0});
+    fds.push_back({li_fd, POLLIN, 0});
+    fds.push_back({mouse_server_fd, POLLIN, 0});
+    fds.push_back({-1, POLLIN, 0});
 
-    int addon_fd = -1;
+    int              addon_fd           = -1;
+    int              pending_backspaces = 0;
+
+    struct sigaction sa{};
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGINT, &sa, NULL);
 
     while (true) {
-        int ret = poll(fds.data(), fds.size(), -1);
+        int poll_timeout = (pending_backspaces > 0) ? 1 : -1;
+        int ret          = poll(fds.data(), fds.size(), poll_timeout);
 
         if (ret < 0) {
             // if error, continue
-            if (errno == EINTR)
+            if (errno == EINTR) {
+                if (!g_running.load(std::memory_order_acquire)) {
+                    break;
+                }
                 continue;
+            }
             break; // real error
         }
 
+        if (ret == 0) {
+            if (pending_backspaces > 0) {
+                send_single_backspace();
+                --pending_backspaces;
+            }
+        }
+
+        libinput_dispatch(li); // Update internal state
+
         // handle socket (backspace)
         if (fds[0].revents & POLLIN) {
-            int client_fd = accept(server_fd, nullptr, nullptr);
+            int client_fd = accept4(server_fd, nullptr, nullptr, SOCK_NONBLOCK);
             if (client_fd >= 0) {
-                int          num_backspace = 0;
-                int          n             = recv(client_fd, &num_backspace, sizeof(num_backspace), 0);
-
                 struct ucred cred;
                 socklen_t    len                = sizeof(struct ucred);
                 char         exe_path[PATH_MAX] = {0};
@@ -211,53 +223,67 @@ int main(int argc, char* argv[]) {
                     }
                 }
 
-                if (n > 0 && strcmp(exe_path, "/usr/bin/fcitx5") == 0) {
-                    send_backspace_uinput(num_backspace);
-                    char ack = '7';
-                    send(client_fd, &ack, sizeof(ack), MSG_NOSIGNAL);
+                if (strcmp(exe_path, "/usr/bin/fcitx5") == 0) {
+                    if (fds[3].fd >= 0) {
+                        close(fds[3].fd);
+                    }
+                    fds[3].fd = client_fd;
+                } else {
+                    close(client_fd);
                 }
-                close(client_fd);
+            }
+        }
+
+        // handle connect from addon
+        if (fds[3].revents & (POLLIN | POLLHUP | POLLERR)) {
+            int count = 0;
+            if (fds[3].fd >= 0) {
+                ssize_t n = recv(fds[3].fd, &count, sizeof(count), 0);
+                if (n <= 0) {
+                    close(fds[3].fd);
+                    fds[3].fd = -1;
+                } else {
+                    if (count > 10) {
+                        count = 10;
+                    }
+                    pending_backspaces += count - 1;
+                    send_single_backspace();
+                }
             }
         }
 
         // connect to mouse socket
         if (fds[2].revents & POLLIN) {
-            int new_fd = accept(mouse_server_fd, nullptr, nullptr);
+            int new_fd = accept4(mouse_server_fd, nullptr, nullptr, SOCK_NONBLOCK);
             if (new_fd >= 0) {
                 if (addon_fd >= 0)
                     close(addon_fd);
                 addon_fd = new_fd;
-                fcntl(addon_fd, F_SETFL, O_NONBLOCK);
             }
         }
 
         // handle mouse (libinput)
         if (fds[1].revents & POLLIN) {
-            libinput_dispatch(li); // Update internal state
             struct libinput_event* event;
 
             while ((event = libinput_get_event(li))) {
                 enum libinput_event_type type = libinput_event_get_type(event);
 
-                if (type == LIBINPUT_EVENT_DEVICE_ADDED) {
+                if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
+                    struct libinput_event_pointer* p = libinput_event_get_pointer_event(event);
+                    // only when pressed
+                    if (libinput_event_pointer_get_button_state(p) == LIBINPUT_BUTTON_STATE_PRESSED) {
+                        // send flag through socket
+                        if (addon_fd >= 0) {
+                            send(addon_fd, "C", 1, MSG_NOSIGNAL | MSG_DONTWAIT);
+                        }
+                    }
+                } else if (type == LIBINPUT_EVENT_DEVICE_ADDED) {
                     // add new device
                     struct libinput_device* dev = libinput_event_get_device(event);
                     if (libinput_device_config_tap_get_finger_count(dev) > 0) {
                         libinput_device_config_tap_set_enabled(dev, LIBINPUT_CONFIG_TAP_ENABLED);
                         libinput_device_config_tap_set_button_map(dev, LIBINPUT_CONFIG_TAP_MAP_LRM);
-                    }
-                } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-                    struct libinput_event_pointer* p = libinput_event_get_pointer_event(event);
-                    // only when pressed
-                    if (libinput_event_pointer_get_button_state(p) == LIBINPUT_BUTTON_STATE_PRESSED) {
-
-                        // send flag through socket
-                        if (addon_fd >= 0) {
-                            if (send(addon_fd, "C", 1, MSG_NOSIGNAL) < 0) {
-                                close(addon_fd);
-                                addon_fd = -1;
-                            }
-                        }
                     }
                 }
                 libinput_event_destroy(event);
@@ -271,6 +297,12 @@ int main(int argc, char* argv[]) {
     if (uinput_fd_ >= 0) {
         ioctl(uinput_fd_, UI_DEV_DESTROY);
         close(uinput_fd_);
+    }
+    if (addon_fd >= 0) {
+        close(addon_fd);
+    }
+    if (fds[3].fd >= 0) {
+        close(fds[3].fd);
     }
     close(server_fd);
     close(mouse_server_fd);
