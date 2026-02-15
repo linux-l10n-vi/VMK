@@ -1,11 +1,11 @@
-<a name="readme-top"></a>
+<a id="readme-top"></a>
 
 <div align="center">
   <a href="https://github.com/nhktmdzhg/VMK">
     <img src="data/icons/scalable/apps/fcitx-vmk.svg" alt="Logo" width="80" height="80">
   </a>
 
-  <h2 align="center">Fcitx5 VMK (Nanoka)</h1>
+  <h2 align="center">Fcitx5 VMK</h2>
 
   <p align="center">
     <b>Bộ gõ tiếng Việt đơn giản, hiệu năng cao cho Linux</b>
@@ -29,12 +29,12 @@
   </p>
 
   <p align="center">
-    <a href="#-cài-đặt"><strong>Cài đặt »</strong></a>
+    <a href="#cài-đặt"><strong>Cài đặt »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/nhktmdzhg/VMK/issues/new?labels=bug">Báo lỗi</a>
+    <a href="https://github.com/nhktmdzhg/VMK/issues/new?template=bug_report.yml">Báo lỗi</a>
     &middot;
-    <a href="https://github.com/nhktmdzhg/VMK/issues/new?labels=enhancement">Yêu cầu tính năng</a>
+    <a href="https://github.com/nhktmdzhg/VMK/issues/new?template=feature_request.yml">Yêu cầu tính năng</a>
   </p>
 </div>
 
@@ -47,17 +47,19 @@ Dự án này là một bản fork được tối ưu hóa từ [bộ gõ VMK g�
 <details>
   <summary><b>Mục lục</b></summary>
   <ol>
-    <li><a href="#-cài-đặt">Cài đặt</a></li>
-    <li><a href="#-bật-bộ-gõ">Bật bộ gõ</a></li>
-    <li><a href="#-hướng-dẫn-sử-dụng">Hướng dẫn sử dụng</a></li>
-    <li><a href="#-gỡ-cài-đặt">Gỡ cài đặt</a></li>
-    <li><a href="#-cải-tiến-nổi-bật">Cải tiến nổi bật</a></li>
-    <li><a href="#-đóng-góp">Đóng góp</a></li>
-    <li><a href="#-giấy-phép">Giấy phép</a></li>
+    <li><a href="#cài-đặt">Cài đặt</a></li>
+    <li><a href="#bật-bộ-gõ">Bật bộ gõ</a></li>
+    <li><a href="#hướng-dẫn-sử-dụng">Hướng dẫn sử dụng</a></li>
+    <li><a href="#gỡ-cài-đặt">Gỡ cài đặt</a></li>
+    <li><a href="#cải-tiến-nổi-bật">Cải tiến nổi bật</a></li>
+    <li><a href="#đóng-góp">Đóng góp</a></li>
+    <li><a href="#giấy-phép">Giấy phép</a></li>
   </ol>
 </details>
 
 ---
+
+<a id="cài-đặt"></a>
 
 ## 📦 Cài đặt
 
@@ -190,6 +192,8 @@ sudo make install PREFIX=/usr/local
 
 ---
 
+<a id="bật-bộ-gõ"></a>
+
 ## ⚙️ Bật bộ gõ
 
 Sau khi cài đặt xong, bạn cần thực hiện các bước sau để bật bộ gõ VMK:
@@ -230,7 +234,7 @@ Log out và log in để áp dụng thay đổi.
 <summary><b>Nếu bạn vẫn chưa gõ được sau khi log out</b></summary>
 <br>
 
-Nếu cấu hình tại `~/.bash_profile` không hoạt động, bạn có thể thử thiết lập tại `/etc/environment` để áp dụng cho toàn bộ hệ thống:
+Nếu cấu hình tại `~/.bash_profile` hoặc `~/.zprofile` không hoạt động, bạn có thể thử thiết lập tại `/etc/environment` để áp dụng cho toàn bộ hệ thống:
 
 ```bash
 cat <<EOF | sudo tee -a /etc/environment
@@ -261,14 +265,19 @@ Thêm `fcitx5` vào danh sách ứng dụng khởi động cùng hệ thống (A
 <summary><b>Hướng dẫn Autostart cho từng Desktop Environment (GNOME, KDE, ...)</b></summary>
 <br>
 
-| Desktop Environment                                        | Hướng dẫn                                                                                                  |
-| :--------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------- |
-| **GNOME, Cinnamon, Unity, MATE, Pantheon, Budgie, COSMIC** | Mở _Startup Applications_ → Add → `Fcitx 5`                                                                |
-| **KDE Plasma**                                             | _System Settings_ → _Startup and Shutdown_ → _Autostart_ → Add... → Add Application... → `Fcitx 5`         |
-| **Xfce**                                                   | _Settings_ → _Session and Startup_ → _Application Autostart_ → Add → `Fcitx 5`                             |
-| **LXQt / LXDE**                                            | _Preferences_ → _Session Settings_ → _Autostart_ → Add → `Fcitx 5`                                         |
-| **i3 / Sway**                                              | Thêm `exec --no-startup-id fcitx5 -d` vào file config (`~/.config/i3/config` hoặc `~/.config/sway/config`) |
-| **Hyprland**                                               | Thêm `exec-once = fcitx5 -d` vào `~/.config/hypr/hyprland.conf`                                            |
+| DE / WM        | Hướng dẫn chi tiết                                                                                                             |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| **GNOME**      | Mở **GNOME Tweaks** → _Startup Applications_ → Add → `Fcitx 5`                                                                 |
+| **KDE Plasma** | **System Settings** → _Autostart_ → Add... → Add Application... → `Fcitx 5`                                                    |
+| **Xfce**       | **Settings** → _Session and Startup_ → _Application Autostart_ → Add → `Fcitx 5`                                               |
+| **Cinnamon**   | **System Settings** → _Startup Applications_ → `+` → Choose application → `Fcitx 5`                                            |
+| **MATE**       | **Control Center** → _Startup Applications_ → Add (Name: `Fcitx 5`, Command: `fcitx5`)                                         |
+| **Pantheon**   | **System Settings** → _Applications_ → _Startup_ → _Add Startup App..._ → `Fcitx 5`                                            |
+| **Budgie**     | **Budgie Desktop Settings** → _Autostart_ → `+` → Add application → `Fcitx 5`                                                  |
+| **LXQt**       | **LXQt Configuration Center** → _Session Settings_ → _Autostart_ → _LXQt Autostart_ → Add (Name: `Fcitx 5`, Command: `fcitx5`) |
+| **COSMIC**     | **COSMIC Settings** → _Applications_ → _Startup Applications_ → Add app → `Fcitx 5`                                            |
+| **i3 / Sway**  | Thêm `exec --no-startup-id fcitx5 -d` vào file config (`~/.config/i3/config` hoặc `~/.config/sway/config`)                     |
+| **Hyprland**   | Thêm `exec-once = fcitx5 -d` vào `~/.config/hypr/hyprland.conf`                                                                |
 
 > **Lưu ý:** Hãy tắt autostart của IBus (thường là `ibus-daemon` hoặc `ibus`) để tránh xung đột. Tốt nhất là gỡ cài đặt IBus nếu không sử dụng.
 
@@ -295,6 +304,8 @@ Nếu bạn sử dụng **Wayland**, Fcitx5 cần được cấp quyền để h
 
 ---
 
+<a id="hướng-dẫn-sử-dụng"></a>
+
 ## 📖 Hướng dẫn sử dụng
 
 ### 1. Menu chuyển mode nhanh
@@ -318,6 +329,8 @@ Khi đang ở trong bất kỳ ứng dụng nào, nhấn phím **`** (dấu huy�
 Khi bạn click chuột hoặc chạm vào touchpad để đổi vị trí nhập liệu, bộ gõ sẽ tự động đặt lại trạng thái ngay lập tức. Điều này giúp tránh lỗi dính chữ cũ vào từ mới (một lỗi rất phổ biến trên các bộ gõ Linux khác).
 
 ---
+
+<a id="gỡ-cài-đặt"></a>
 
 ## 🗑️ Gỡ cài đặt
 
@@ -383,6 +396,8 @@ sudo make uninstall
 
 ---
 
+<a id="cải-tiến-nổi-bật"></a>
+
 ## 🚀 Cải tiến nổi bật
 
 <details>
@@ -414,6 +429,8 @@ Cải thiện trải nghiệm người dùng với các tính năng tiện ích:
 
 ---
 
+<a id="đóng-góp"></a>
+
 ## 🤝 Đóng góp
 
 Đóng góp là điều làm cho cộng đồng mã nguồn mở trở thành một nơi tuyệt vời để học hỏi, truyền cảm hứng và sáng tạo. Mọi đóng góp của bạn đều được **đánh giá cao**.
@@ -429,6 +446,8 @@ Vui lòng xem hướng dẫn chi tiết tại [đây](CONTRIBUTING.md) để bi�
 </a>
 
 ---
+
+<a id="giấy-phép"></a>
 
 ## 📃 Giấy phép
 
