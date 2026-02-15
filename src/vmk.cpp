@@ -1680,11 +1680,11 @@ namespace fcitx {
                     break;
                 }
                 case FcitxKey_w: {
-                    selectedMode = VMKMode::Off;
+                    selectedMode = VMKMode::Emoji;
                     break;
                 }
                 case FcitxKey_e: {
-                    selectedMode = VMKMode::Emoji;
+                    selectedMode = VMKMode::Off;
                     break;
                 }
                 case FcitxKey_r: {
@@ -1987,8 +1987,8 @@ namespace fcitx {
         candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::VMK1HC, _("[3] Fake backspace by Uinput for wine apps")), applyMode(VMKMode::VMK1HC)));
         candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::VMK2, _("[4] Surrounding Text")), applyMode(VMKMode::VMK2)));
         candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::Preedit, _("[q] Preedit")), applyMode(VMKMode::Preedit)));
-        candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::Off, "[w] OFF - Disable Input Method"), applyMode(VMKMode::Off)));
-        candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::Emoji, _("[e] Emoji mode")), applyMode(VMKMode::Emoji)));
+        candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::Emoji, _("[w] Emoji mode")), applyMode(VMKMode::Emoji)));
+        candidateList->append(std::make_unique<AppModeCandidateWord>(getLabel(VMKMode::Off, "[e] OFF - Disable Input Method"), applyMode(VMKMode::Off)));
 
         candidateList->append(std::make_unique<AppModeCandidateWord>(Text(_("[r] Remove app settings")), [this, cleanup](InputContext* ic) {
             if (appRules_.count(currentConfigureApp_)) {
