@@ -1090,16 +1090,12 @@ namespace fcitx {
             // This ensures text is saved regardless of which mode we're switching from.
             if (vmkEngine_) {
                 // Finalize preedit properly (required for Preedit mode)
-                EngineCommitPreedit(vmkEngine_.handle());
-                UniqueCPtr<char> commit(EnginePullCommit(vmkEngine_.handle()));
-                if (commit && commit.get()[0]) {
-                    ic_->commitString(commit.get());
-                }
-
-                // Pull any remaining preedit text (for VMK1/VMKSmooth modes)
-                UniqueCPtr<char> preedit(EnginePullPreedit(vmkEngine_.handle()));
-                if (preedit && preedit.get()[0]) {
-                    ic_->commitString(preedit.get());
+                if (realMode == VMKMode::Preedit) {
+                    EngineCommitPreedit(vmkEngine_.handle());
+                    UniqueCPtr<char> commit(EnginePullCommit(vmkEngine_.handle()));
+                    if (commit && commit.get()[0]) {
+                        ic_->commitString(commit.get());
+                    }
                 }
             }
 
