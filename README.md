@@ -51,7 +51,6 @@ Dự án này là một bản fork được tối ưu hóa từ [bộ gõ VMK g�
     <li><a href="#bật-bộ-gõ">Bật bộ gõ</a></li>
     <li><a href="#hướng-dẫn-sử-dụng">Hướng dẫn sử dụng</a></li>
     <li><a href="#gỡ-cài-đặt">Gỡ cài đặt</a></li>
-    <li><a href="#cải-tiến-nổi-bật">Cải tiến nổi bật</a></li>
     <li><a href="#đóng-góp">Đóng góp</a></li>
     <li><a href="#giấy-phép">Giấy phép</a></li>
   </ol>
